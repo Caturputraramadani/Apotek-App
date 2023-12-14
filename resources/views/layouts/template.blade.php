@@ -24,7 +24,7 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="/">Dashboard</a>
                     </li>
-                    <li class="nav-item dropdown">
+                    {{-- <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             Obat
@@ -41,6 +41,43 @@
                     <li class="nav-item">
                         <a class="nav-link active" aria-current="page" href="{{ route('user.index') }}">Kelola
                             Akun</a>
+                    </li>
+                    @if (Auth::check())
+                    <li class="nav-item">
+                        <a href="{{ route('logout') }}" class="nav-link">Logout</a>
+                    </li>
+                    @endif --}}
+
+
+                    <li>
+                        @if (Auth::check())
+                        @if (Auth::user()->role == "admin")
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            Obat
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ route('medicine.home') }}">Data Obat</a></li>
+                            <li><a class="dropdown-item" href="{{ route('medicine.create') }}">Tambah</a></li>
+                            <li><a class="dropdown-item" href="{{ route('medicine.stock') }}">Stok</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="{{ route('order.data') }}">Pembelian</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="{{ route('user.index') }}">Kelola Akun</a>
+                    </li>
+                    @else
+                    <li class="nav-item">
+                        <a class="nav-link" aria-current="page" href="{{ route('kasir.order.index') }}">Pembelian</a>
+                    </li>
+                    @endif
+                    <li class="nav-item">
+                        <a href="{{ route('logout') }}" class="nav-link"> Logout</a>
+                    </li>
+                    @endif
                     </li>
                 </ul>
             </div>

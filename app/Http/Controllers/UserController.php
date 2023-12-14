@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
+
 
 class UserController extends Controller
 {
@@ -68,20 +71,28 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         $request->validate([
             'name' => 'required|min:3',
             'email' => 'required|email:dns',
-            'role' => 'required'
+            'role' => 'required',
+            'password' => 'required'
         ]);
 
-        $password = substr($request->email, 0, 3) . substr($request->name, 0, 3);
 
-        User::where('id', $id)->update([
+        $userData = [
             'name' => $request->name,
             'email' => $request->email,
             'role' => $request->role,
-            'password' => Hash::make($password)
-        ]);
+        ];
+
+        if ($request->filled('password')) {
+            // Jika ya, hash password baru
+            $hashedPassword = Hash::make($request->password);
+            $userData['password'] = $hashedPassword;
+        }
+
+        User::where('id', $id)->update($userData);
 
         return redirect()->route('user.index')->with('success', 'Berhasil mengubah data!');
     }
@@ -94,5 +105,28 @@ class UserController extends Controller
         User::where('id', $id)->delete();
 
         return redirect()->back()->with('deleted', 'Berhasil menghapus data!');
+    }
+
+    public function loginAuth(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email:dns',
+            'password' => 'required',
+        ]);
+
+        $user = $request->only(['email', 'password']);
+        if (Auth::attempt($user)) {
+            return redirect()->route('home.page');
+        } else {
+            return redirect()->back()->with('failed', 'Proses login gagal, silahkan coba kembali dengan data yang benar!');
+        }
+    }
+
+
+
+    public function logout()
+    {
+        Auth::logout();
+        return redirect()->route('login')->with('logout', 'Anda telah logout!');
     }
 }
